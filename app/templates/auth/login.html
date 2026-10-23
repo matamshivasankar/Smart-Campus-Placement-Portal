@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, render_checkbox %}
+{% block title %}Log in · Smart Campus Placement Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card">
+      <div class="card-header">Log in to your account</div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          {{ render_field(form.email, help_text='Use the email address you registered with.') }}
+          {{ render_field(form.password) }}
+          {{ render_checkbox(form.remember) }}
+          {{ form.submit(class='btn btn-primary w-100') }}
+        </form>
+      </div>
+      <div class="card-footer bg-white text-center text-small">
+        <a href="{{ url_for('auth.register_student') }}">Create a student account</a>
+        &middot;
+        <a href="{{ url_for('auth.register_recruiter') }}">Register as a recruiter</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

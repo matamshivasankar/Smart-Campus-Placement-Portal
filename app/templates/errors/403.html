@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Access denied · Smart Campus Placement Portal{% endblock %}
+
+{% block content %}
+<div class="card mx-auto" style="max-width: 640px;">
+  <div class="card-body text-center py-4">
+    <i class="bi bi-shield-lock text-danger display-4"></i>
+    <h1 class="h3 mt-3">Access denied</h1>
+    <p class="text-muted">
+      {{ error.description if error and error.description else 'Your account is not permitted to open this page.' }}
+    </p>
+    <a class="btn btn-primary" href="{{ url_for('main.home') }}">Back to home</a>
+  </div>
+</div>
+{% endblock %}

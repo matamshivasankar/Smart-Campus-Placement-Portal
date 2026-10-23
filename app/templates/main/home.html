@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Home · Smart Campus Placement Portal{% endblock %}
+
+{% block content %}
+<div class="hero p-4 p-md-5 mb-4">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <h1 class="display-6 fw-semibold">Campus placements, managed end to end</h1>
+      <p class="lead mb-3">
+        Students apply to verified openings, recruiters track candidates through every
+        interview round, and the placement cell keeps the entire process auditable.
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        {% if current_user %}
+          <a class="btn btn-light" href="{{ url_for('main.job_board') }}">Browse job board</a>
+        {% else %}
+          <a class="btn btn-light" href="{{ url_for('auth.register_student') }}">Register as student</a>
+          <a class="btn btn-outline-light" href="{{ url_for('auth.register_recruiter') }}">Register as recruiter</a>
+          <a class="btn btn-outline-light" href="{{ url_for('auth.login') }}">Log in</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('Open job postings', stats.open_jobs, 'bi-briefcase', 'primary'),
+    ('Hiring companies', stats.companies, 'bi-building', 'success'),
+    ('Registered students', stats.students, 'bi-people', 'info'),
+    ('Students placed', stats.placed, 'bi-patch-check', 'warning')
+  ] %}
+  {% for label, value, icon, colour in cards %}
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="stat-value text-{{ colour }}">{{ value }}</div>
+              <div class="stat-label">{{ label }}</div>
+            </div>
+            <i class="bi {{ icon }} fs-3 text-{{ colour }} opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Latest open positions</span>
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('main.job_board') }}">View all</a>
+      </div>
+      <div class="card-body">
+        {% if latest_jobs %}
+          <div class="list-group list-group-flush">
+            {% for job in latest_jobs %}
+              <div class="list-group-item px-0">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                  <div>
+                    <h2 class="h6 mb-1">
+                      <a class="text-decoration-none" href="{{ url_for('main.job_detail', job_id=job.id) }}">{{ job.title }}</a>
+                    </h2>
+                    <p class="mb-1 text-muted text-small">
+                      {{ job.company.name }} &middot; {{ job.location }} &middot; {{ job.employment_type }}
+                    </p>
+                    <span class="badge text-bg-light">Min CGPA {{ job.min_cgpa if job.min_cgpa is not none else 'N/A' }}</span>
+                    {% if job.eligible_graduation_year %}
+                      <span class="badge text-bg-light">Batch {{ job.eligible_graduation_year }}</span>
+                    {% endif %}
+                    {% for skill in job.skill_names[:4] %}
+                      <span class="badge text-bg-primary-subtle text-primary-emphasis">{{ skill }}</span>
+                    {% endfor %}
+                  </div>
+                  <div class="text-end text-small">
+                    <div class="text-muted">Apply by</div>
+                    <div class="fw-semibold">{{ job.deadline | d }}</div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No approved job postings are currently open.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-header">Companies hiring now</div>
+      <div class="card-body">
+        {% if top_companies %}
+          <ul class="list-group list-group-flush">
+            {% for name, jobs in top_companies %}
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span>{{ name }}</span>
+                <span class="badge text-bg-secondary">{{ jobs }} job(s)</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0">No approved postings yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

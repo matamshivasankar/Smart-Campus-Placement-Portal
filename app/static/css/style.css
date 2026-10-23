@@ -1,0 +1,85 @@
+/* Smart Campus Placement Portal - shared stylesheet */
+:root {
+  --brand: #0d6efd;
+  --brand-dark: #0a58ca;
+  --surface: #f6f8fb;
+}
+
+body {
+  background-color: var(--surface);
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.navbar-brand { letter-spacing: .2px; }
+
+.card {
+  border: 1px solid rgba(15, 23, 42, .08);
+  border-radius: .75rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, .08);
+  font-weight: 600;
+}
+
+.stat-card .stat-value {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.stat-card .stat-label {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .72rem;
+  color: #6c757d;
+}
+
+.page-title {
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.table > :not(caption) > * > * { vertical-align: middle; }
+
+.job-card { transition: box-shadow .15s ease-in-out, transform .15s ease-in-out; }
+.job-card:hover { box-shadow: 0 6px 18px rgba(15, 23, 42, .09); transform: translateY(-2px); }
+
+.hero {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  color: #fff;
+  border-radius: 1rem;
+}
+
+.hero .lead { color: rgba(255, 255, 255, .88); }
+
+.timeline { list-style: none; padding-left: 0; }
+.timeline li {
+  position: relative;
+  padding: 0 0 1rem 1.75rem;
+  border-left: 2px solid #dee2e6;
+}
+.timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: .3rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.filter-bar {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, .08);
+  border-radius: .75rem;
+  padding: 1rem;
+}
+
+.text-small { font-size: .85rem; }
+
+footer a { color: rgba(255, 255, 255, .75); }

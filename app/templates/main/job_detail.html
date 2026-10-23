@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, eligibility_list %}
+{% block title %}{{ job.title }} · {{ job.company.name }}{% endblock %}
+
+{% block content %}
+<a class="btn btn-sm btn-outline-secondary mb-3" href="{{ url_for('main.job_board') }}">
+  <i class="bi bi-arrow-left"></i> Back to job board
+</a>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div>
+        <h1 class="h3 page-title mb-1">{{ job.title }}</h1>
+        <p class="text-muted mb-2">
+          <i class="bi bi-building"></i> {{ job.company.name }}
+          {% if job.company.website %}
+            &middot; <a href="{{ job.company.website }}" target="_blank" rel="noopener">Website</a>
+          {% endif %}
+        </p>
+      </div>
+      <div class="text-end">
+        {{ status_badge(job.status) }}
+        {% if job.approval_status != 'approved' %}
+          <span class="badge text-bg-warning">{{ job.approval_status }} approval</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="row mt-3 g-3 text-small">
+      <div class="col-sm-6 col-lg-3"><strong>Location</strong><br>{{ job.location }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Employment type</strong><br>{{ job.employment_type }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Compensation</strong><br>{{ job.salary_display }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Openings</strong><br>{{ job.openings }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Apply by</strong><br>{{ job.deadline | d }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Posted on</strong><br>{{ job.created_at | dt('%d %b %Y') }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Recruiter</strong><br>{{ job.recruiter.full_name }}</div>
+      <div class="col-sm-6 col-lg-3"><strong>Applications</strong><br>{{ job.applications | length }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header">Job description</div>
+      <div class="card-body">
+        <p style="white-space: pre-line;">{{ job.description }}</p>
+        {% if job.responsibilities %}
+          <h2 class="h6 mt-3">Responsibilities</h2>
+          <p style="white-space: pre-line;">{{ job.responsibilities }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if current_user and current_user.is_student and eligibility %}
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Your eligibility</span>
+          {% if eligibility.eligible %}
+            <span class="badge text-bg-success">Eligible</span>
+          {% else %}
+            <span class="badge text-bg-danger">Not eligible</span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {{ eligibility_list(eligibility) }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header">Eligibility criteria</div>
+      <div class="card-body text-small">
+        <ul class="list-unstyled mb-0">
+          <li><strong>Minimum CGPA:</strong> {{ job.min_cgpa if job.min_cgpa is not none else 'No minimum' }}</li>
+          <li><strong>Eligible batch:</strong> {{ job.eligible_graduation_year or 'All years' }}</li>
+          <li><strong>Departments:</strong> {{ job.department_list | join(', ') if job.department_list else 'All departments' }}</li>
+          <li><strong>Max active backlogs:</strong> {{ job.max_backlogs if job.max_backlogs is not none else 'No limit' }}</li>
+          <li class="mt-2">
+            <strong>Required skills:</strong>
+            {% if job.skill_names %}
+              {% for skill in job.skill_names %}
+                <span class="badge text-bg-primary-subtle text-primary-emphasis">{{ skill }}</span>
+              {% endfor %}
+            {% else %}
+              None listed
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    {% if current_user and current_user.is_student %}
+      <div class="card">
+        <div class="card-header">Apply</div>
+        <div class="card-body">
+          {% if application %}
+            <p class="mb-2">You have already applied to this job.</p>
+            <p class="mb-3">Current status: {{ status_badge(application.status) }}</p>
+            <a class="btn btn-outline-primary w-100"
+               href="{{ url_for('student.application_detail', application_id=application.id) }}">
+              View my application
+            </a>
+          {% elif job.is_open and eligibility and eligibility.eligible %}
+            <form method="post" action="{{ url_for('student.apply', job_id=job.id) }}">
+              {{ form.hidden_tag() }}
+              <div class="mb-3">
+                {{ form.cover_letter.label(class='form-label') }}
+                {{ form.cover_letter(class='form-control', rows='4',
+                     placeholder='Optional note to the recruiter, e.g. why you are a good fit') }}
+                {% for error in form.cover_letter.errors %}
+                  <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <button class="btn btn-primary w-100" type="submit">Submit application</button>
+            </form>
+          {% elif application is none and not job.is_open %}
+            <p class="mb-0 text-muted">Applications are closed for this posting.</p>
+          {% elif eligibility %}
+            <p class="mb-2 text-danger">You do not currently meet the criteria for this job.</p>
+            <a class="btn btn-outline-secondary w-100" href="{{ url_for('student.profile') }}">
+              Update my profile
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% elif not current_user %}
+      <div class="card">
+        <div class="card-body text-center">
+          <p class="mb-2">Log in as a student to apply for this job.</p>
+          <a class="btn btn-primary" href="{{ url_for('auth.login') }}">Log in</a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

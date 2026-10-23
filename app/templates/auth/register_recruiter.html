@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+{% block title %}Recruiter registration · Smart Campus Placement Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">Register a recruiter account</div>
+      <div class="card-body">
+        <div class="alert alert-info text-small mb-3">
+          A placement officer reviews every recruiter registration. You can sign in
+          immediately, but posting jobs becomes available only after approval.
+        </div>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="row">
+            <div class="col-md-6">{{ render_field(form.full_name) }}</div>
+            <div class="col-md-6">{{ render_field(form.email, help_text='A work email address is recommended.') }}</div>
+            <div class="col-md-6">{{ render_field(form.designation) }}</div>
+            <div class="col-md-6">{{ render_field(form.phone) }}</div>
+            <div class="col-md-6">{{ render_field(form.company_name) }}</div>
+            <div class="col-md-6">{{ render_field(form.company_website) }}</div>
+            <div class="col-md-6">{{ render_field(form.company_location) }}</div>
+            <div class="col-md-6">{{ render_field(form.company_industry) }}</div>
+            <div class="col-md-6">{{ render_field(form.password) }}</div>
+            <div class="col-md-6">{{ render_field(form.confirm_password) }}</div>
+          </div>
+          {{ form.submit(class='btn btn-primary') }}
+          <a class="btn btn-outline-secondary" href="{{ url_for('auth.login') }}">I already have an account</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

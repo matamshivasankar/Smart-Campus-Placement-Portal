@@ -1,0 +1,93 @@
+{# Reusable form + UI macros. #}
+
+{% macro render_field(field, extra_class='', help_text=None) %}
+  <div class="mb-3">
+    <label class="form-label" for="{{ field.id }}">{{ field.label.text }}
+      {% if field.flags.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    {{ field(class='form-control ' ~ extra_class ~ (' is-invalid' if field.errors else '')) }}
+    {% if help_text %}<div class="form-text">{{ help_text }}</div>{% endif %}
+    {% for error in field.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro render_select(field, extra_class='', help_text=None) %}
+  <div class="mb-3">
+    <label class="form-label" for="{{ field.id }}">{{ field.label.text }}
+      {% if field.flags.required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+    {{ field(class='form-select ' ~ extra_class ~ (' is-invalid' if field.errors else '')) }}
+    {% if help_text %}<div class="form-text">{{ help_text }}</div>{% endif %}
+    {% for error in field.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro render_checkbox(field) %}
+  <div class="form-check mb-3">
+    {{ field(class='form-check-input' ~ (' is-invalid' if field.errors else '')) }}
+    <label class="form-check-label" for="{{ field.id }}">{{ field.label.text }}</label>
+    {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  <span class="badge text-bg-{{ status | status_class }}">{{ status }}</span>
+{% endmacro %}
+
+{% macro csrf_field() %}
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% endmacro %}
+
+{% macro pagination_nav(pagination, endpoint) %}
+  {# Existing query-string filters are preserved; only "page" changes. #}
+  {% set params = request.args.to_dict() %}
+  {% if params.pop('page', None) %}{% endif %}
+  {% if pagination and pagination.pages and pagination.pages > 1 %}
+    <nav aria-label="Pagination">
+      <ul class="pagination justify-content-center mt-3">
+        <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+          <a class="page-link" href="{{ url_for(endpoint, page=pagination.prev_num, **params) if pagination.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+          {% if page_num %}
+            <li class="page-item {{ 'active' if page_num == pagination.page }}">
+              <a class="page-link" href="{{ url_for(endpoint, page=page_num, **params) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+          <a class="page-link" href="{{ url_for(endpoint, page=pagination.next_num, **params) if pagination.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+      <p class="text-center text-muted small">
+        Showing page {{ pagination.page }} of {{ pagination.pages }} &middot; {{ pagination.total }} record(s)
+      </p>
+    </nav>
+  {% else %}
+    <p class="text-muted small text-center mt-3">{{ pagination.total if pagination else 0 }} record(s)</p>
+  {% endif %}
+{% endmacro %}
+
+{% macro eligibility_list(result) %}
+  <ul class="list-unstyled mb-0 small">
+    {% for check in result.checks %}
+      <li class="{{ 'text-success' if check.passed else 'text-danger' }}">
+        <i class="bi {{ 'bi-check-circle-fill' if check.passed else 'bi-x-circle-fill' }}"></i>
+        <strong>{{ check.criterion }}:</strong> {{ check.detail }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% macro empty_state(message, icon='bi-inbox') %}
+  <div class="text-center text-muted py-4">
+    <i class="bi {{ icon }} fs-1 d-block mb-2"></i>
+    <p class="mb-0">{{ message }}</p>
+  </div>
+{% endmacro %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, render_select %}
+{% block title %}Student registration · Smart Campus Placement Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">Create a student account</div>
+      <div class="card-body">
+        <p class="text-muted text-small">
+          Your CGPA, skills, department and graduation year are used to calculate job
+          eligibility. You can update them later from your profile.
+        </p>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="row">
+            <div class="col-md-6">{{ render_field(form.full_name) }}</div>
+            <div class="col-md-6">{{ render_field(form.email) }}</div>
+            <div class="col-md-6">{{ render_field(form.roll_number) }}</div>
+            <div class="col-md-6">{{ render_select(form.department) }}</div>
+            <div class="col-md-6">{{ render_field(form.degree, help_text='e.g. B.Tech, B.E., MCA') }}</div>
+            <div class="col-md-3">{{ render_field(form.cgpa) }}</div>
+            <div class="col-md-3">{{ render_field(form.graduation_year) }}</div>
+            <div class="col-md-6">{{ render_field(form.phone) }}</div>
+            <div class="col-md-6">{{ render_field(form.skills, help_text='Comma separated, e.g. Python, SQL, Java') }}</div>
+            <div class="col-md-6">{{ render_field(form.password) }}</div>
+            <div class="col-md-6">{{ render_field(form.confirm_password) }}</div>
+          </div>
+          {{ form.submit(class='btn btn-primary') }}
+          <a class="btn btn-outline-secondary" href="{{ url_for('auth.login') }}">I already have an account</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
